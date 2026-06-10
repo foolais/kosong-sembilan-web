@@ -10,19 +10,30 @@ export function proxy(request: NextRequest) {
 
   const token = request.cookies.get("accessToken")?.value;
 
-  if (!token) {
+  let isValidToken = false;
+  if (token) {
+    try {
+      verifyAccessToken(token);
+      isValidToken = true;
+    } catch {
+      isValidToken = false;
+    }
+  }
+
+  if (isValidToken && pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  if (!isValidToken && pathname !== "/login") {
+    if (pathname.startsWith("/api")) {
+      return NextResponse.json({ message: "Tidak sah" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  try {
-    verifyAccessToken(token);
-
-    return NextResponse.next();
-  } catch {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*", "/"],
+  matcher: ["/api/:path*", "/dashboard/:path*", "/", "/login"],
 };

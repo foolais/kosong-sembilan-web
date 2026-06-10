@@ -3,18 +3,18 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET!;
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
 
-export type JwtPayload = {
+export type IJwtPayload = {
   userId: string;
   email: string;
 };
 
-export function generateAccessToken(payload: JwtPayload) {
+export function generateAccessToken(payload: IJwtPayload) {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: "30m",
   });
 }
 
-export function generateRefreshToken(payload: JwtPayload) {
+export function generateRefreshToken(payload: IJwtPayload) {
   return jwt.sign(payload, REFRESH_SECRET, {
     expiresIn: "7d",
   });
