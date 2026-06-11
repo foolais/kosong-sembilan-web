@@ -24,12 +24,19 @@ import {
 import { FileText, Send, User, Users, XIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
+import { useCreateFamily } from "@/features/family/family.hooks";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type IProps = {
   mode: "CREATE" | "UPDATE";
   initialData?: IFamily;
 };
 const FormFamily = ({ mode }: IProps) => {
+  const familyMutation = useCreateFamily();
+  const router = useRouter();
+  const isCreate = mode === "CREATE";
+
   const form = useForm<IFamilyFormValues>({
     resolver: zodResolver(familySchema),
     defaultValues: {
@@ -49,10 +56,21 @@ const FormFamily = ({ mode }: IProps) => {
   });
 
   const onSubmit = (data: IFamilyFormValues) => {
-    console.log(data);
-  };
+    if (isCreate) {
+      familyMutation.mutate(data, {
+        onSuccess: (response) => {
+          toast.success(response.message);
+          router.replace("/daftar-keluarga");
+        },
+        onError: (error) => {
+          console.error(error);
+          toast.error(error.message || "Terjadi kesalahan");
+        },
+      });
 
-  const isCreate = mode === "CREATE";
+      return;
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto">
