@@ -35,5 +35,12 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*", "/", "/login"],
+  matcher: [
+    "/api/:path*",
+    "/dashboard/:path*",
+    "/tambah-keluarga/:path*",
+    "/daftar-keluarga/:path*",
+    "/",
+    "/login",
+  ],
 };

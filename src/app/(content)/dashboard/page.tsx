@@ -1,10 +1,9 @@
-import LogoutButton from "@/components/logout-button";
+import WelcomingText from "@/components/welcoming-text";
 
 const DashboardPage = () => {
   return (
     <div>
-      DashboardPage
-      <LogoutButton />
+      <WelcomingText />
     </div>
   );
 };

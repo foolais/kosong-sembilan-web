@@ -5,14 +5,17 @@ import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/features/auth/auth.store";
 
 const LogoutButton = () => {
   const logoutMutation = useLogout();
   const router = useRouter();
+  const clearUser = useAuthStore((state) => state.clearUser);
 
   const onLogout = () => {
     logoutMutation.mutate(undefined, {
       onSuccess: (response) => {
+        clearUser();
         toast.success(response.message);
         router.replace("/login");
       },
@@ -25,11 +28,13 @@ const LogoutButton = () => {
 
   return (
     <Button
+      size="sm"
       variant="destructive"
       className="cursor-pointer flex items-center justify-center"
       onClick={onLogout}
     >
-      Logout <LogOut />
+      Logout
+      <LogOut />
     </Button>
   );
 };

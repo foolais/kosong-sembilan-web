@@ -15,11 +15,14 @@ import { Button } from "../ui/button";
 import { useLogin } from "@/features/auth/auth.hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/auth.store";
 
 const FormLogin = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const loginMutattion = useLogin();
   const router = useRouter();
+
+  const setUser = useAuthStore((state) => state.setUser);
 
   const form = useForm<ILoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -32,6 +35,7 @@ const FormLogin = () => {
   const onSubmit = (data: ILoginFormValues) => {
     loginMutattion.mutate(data, {
       onSuccess: (response) => {
+        setUser(response.user);
         toast.success(response.message);
         router.replace("/dashboard");
       },
@@ -55,13 +59,13 @@ const FormLogin = () => {
           <Field data-invalid={fieldState.invalid}>
             <InputGroup>
               <InputGroupAddon align="inline-start">
-                <Mail />
+                <Mail className="text-primary" />
               </InputGroupAddon>
               <InputGroupInput
                 {...field}
                 id={field.name}
                 type="email"
-                placeholder="Masukkan email"
+                placeholder="Email"
                 aria-invalid={fieldState.invalid}
                 autoComplete="username"
               />
@@ -77,13 +81,13 @@ const FormLogin = () => {
           <Field data-invalid={fieldState.invalid}>
             <InputGroup>
               <InputGroupAddon align="inline-start">
-                <Lock />
+                <Lock className="text-primary" />
               </InputGroupAddon>
               <InputGroupInput
                 {...field}
                 id={field.name}
                 type={showPassword ? "text" : "password"}
-                placeholder="Masukkan password"
+                placeholder="Password"
                 aria-invalid={fieldState.invalid}
                 autoComplete="new-password"
               />
@@ -100,6 +104,7 @@ const FormLogin = () => {
         )}
       />
       <Button
+        variant="secondary"
         type="submit"
         className="w-full cursor-pointer flex items-center justify-center font-semibold tracking-wide"
       >
