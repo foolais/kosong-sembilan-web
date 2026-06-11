@@ -22,7 +22,7 @@ const TabsNavigation = () => {
         <Home className="size-6" />
       </Link>
       <Link href="/tambah-keluarga">
-        <Button size="icon">
+        <Button size="icon" className="cursor-pointer">
           <Plus className="text-foreground size-6" />
         </Button>
       </Link>
