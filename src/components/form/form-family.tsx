@@ -4,7 +4,7 @@ import {
   familySchema,
   IFamilyFormValues,
 } from "@/features/family/family.schema";
-import { IFamily } from "@/models/Family";
+import { IFamilyData } from "@/models/Family";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 
 type IProps = {
   mode: "CREATE" | "UPDATE";
-  initialData?: IFamily;
+  initialData?: IFamilyData;
 };
 const FormFamily = ({ mode }: IProps) => {
   const familyMutation = useCreateFamily();

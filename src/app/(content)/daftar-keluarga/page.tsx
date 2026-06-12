@@ -1,5 +1,11 @@
+import ListFamily from "@/components/list-family";
+
 const DaftarPage = () => {
-  return <div>DaftarPage</div>;
+  return (
+    <div className="mx-auto">
+      <ListFamily />
+    </div>
+  );
 };
 
 export default DaftarPage;

@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
     const search = req.nextUrl.searchParams.get("cari");
     const page = Number(req.nextUrl.searchParams.get("halaman") || 1);
-    const limit = Number(req.nextUrl.searchParams.get("batas") || 10);
+    const LIMIT = 20;
 
     const query = search
       ? {
@@ -29,21 +29,21 @@ export async function GET(req: NextRequest) {
         }
       : {};
 
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * LIMIT;
     const total = await Family.countDocuments(query);
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / LIMIT);
 
     const families = await Family.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(LIMIT);
 
     return Response.json({
       success: true,
       data: families,
       pagination: {
         page,
-        limit,
+        limit: LIMIT,
         total,
         totalPages,
         hasNextPage: page < totalPages,

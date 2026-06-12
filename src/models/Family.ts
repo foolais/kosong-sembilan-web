@@ -1,12 +1,20 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
-export interface IFamily extends Document {
-  headFamily: string;
-  status: "resident" | "boarding";
-  members: {
-    name: string;
-  }[];
+export type FamilyStatus = "resident" | "boarding";
+
+export interface IFamilyMember {
+  _id: Types.ObjectId;
+  name: string;
 }
+
+export interface IFamilyData {
+  _id: Types.ObjectId;
+  headFamily: string;
+  status: FamilyStatus;
+  members: IFamilyMember[];
+}
+
+export interface IFamily extends Document, IFamilyData {}
 
 const FamilySchema = new Schema<IFamily>(
   {

@@ -19,9 +19,8 @@ export function useFamilies(params?: IGetFamiliesParams) {
     queryFn: async ({ pageParam }) => {
       const response = await api.get("/families", {
         params: {
-          search: params?.search,
-          page: pageParam,
-          limit: 10,
+          ...(params?.search && { cari: params.search }),
+          ...(pageParam > 1 && { halaman: pageParam }),
         },
       });
 
