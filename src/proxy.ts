@@ -42,5 +42,6 @@ export const config = {
     "/daftar-keluarga/:path*",
     "/",
     "/login",
+    "/profil",
   ],
 };

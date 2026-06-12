@@ -2,31 +2,53 @@
 
 import { useFamilies } from "@/features/family/family.hooks";
 import { useFamilyStore } from "@/features/family/family.store";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
-import { IFamilyData } from "@/models/Family";
+import { IFamilyData, IFamilyMember } from "@/models/Family";
 import { Loader, User, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import HighlightText from "./highlight-text";
 
 const ListFamily = () => {
   const router = useRouter();
-  const searchValue = useFamilyStore((state) => state.searchFamily);
+  const searchFamily = useFamilyStore((state) => state.searchFamily);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useFamilies({
-      search: searchValue,
+      search: searchFamily,
     });
+  const [manualOpenedItems, setManualOpenedItems] = useState<string[]>([]);
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const families = data?.pages.flatMap((page) => page.data) ?? [];
+  const families = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data]
+  );
+
+  const autoOpenedItems = useMemo(() => {
+    if (!searchFamily.trim()) return manualOpenedItems;
+
+    const keyword = searchFamily.toLowerCase();
+
+    return families
+      .filter((family) => {
+        return (
+          family.headFamily.toLowerCase().includes(keyword) ||
+          family.members.some((member: IFamilyMember) =>
+            member.name.toLowerCase().includes(keyword)
+          )
+        );
+      })
+      .map((family) => family._id.toString());
+  }, [families, searchFamily, manualOpenedItems]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -61,7 +83,12 @@ const ListFamily = () => {
       ref={containerRef}
       className="h-[70svh] overflow-y-auto sm:w-md sm:mx-auto"
     >
-      <Accordion type="multiple" className="max-w-lg space-y-4">
+      <Accordion
+        type="multiple"
+        value={autoOpenedItems}
+        onValueChange={setManualOpenedItems}
+        className="max-w-lg space-y-4"
+      >
         {families.map((family: IFamilyData) => (
           <AccordionItem
             key={family._id.toString()}
@@ -76,7 +103,7 @@ const ListFamily = () => {
               )}
             >
               <User className="size-6 shrink-0 mt-0.5" />
-              <span className="min-w-0 break-word">{family.headFamily}</span>
+              <HighlightText text={family.headFamily} search={searchFamily} />
             </AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-1 text-foreground">
@@ -89,7 +116,7 @@ const ListFamily = () => {
                     }
                   >
                     <Users className="size-5 shrink-0 mt-0.5" />
-                    <span className="min-w-0 break-word">{member.name}</span>
+                    <HighlightText text={member.name} search={searchFamily} />
                   </li>
                 ))}
               </ul>

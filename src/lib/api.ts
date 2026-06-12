@@ -8,19 +8,23 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log("ERROR STATUS:", error.response?.status);
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      console.log("TRY REFRESH");
       originalRequest._retry = true;
 
       try {
-        await axios.post(
+        const refresh = await axios.post(
           "/api/auth/refresh",
           {},
           {
             withCredentials: true,
           }
         );
+
+        console.log("REFRESH SUCCESS", refresh.data);
 
         return api(originalRequest);
       } catch {
