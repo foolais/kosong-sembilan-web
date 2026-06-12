@@ -22,7 +22,6 @@ import {
   InputGroupInput,
 } from "../ui/input-group";
 import {
-  ChevronLeft,
   FileText,
   Loader,
   Send,
@@ -43,6 +42,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import BackButton from "../button/back-button";
 
 type IProps = {
   mode: "CREATE" | "UPDATE";
@@ -159,18 +159,7 @@ const FormFamily = ({ mode, familyId }: IProps) => {
     <div className="max-w-md mx-auto">
       {!isCreate && (
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size-="xs"
-              className="h-8 p-2 cursor-pointer"
-              onClick={() => router.back()}
-              disabled={isSubmitting || isDeleting}
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-            <span className="font-semibold">Kembali</span>
-          </div>
+          <BackButton options={{ isSubmitting, isDeleting }} />
           <Button
             variant="destructive"
             className="h-8 p-2 cursor-pointer"
