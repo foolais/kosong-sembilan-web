@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import Family from "@/models/Family";
+import { NextRequest } from "next/server";
 
 export async function GET(
   req: Request,
@@ -82,12 +83,14 @@ export async function PUT(
   }
 }
 
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await connectDB();
 
     const { id } = await params;
-
     const family = await Family.findByIdAndDelete(id);
 
     if (!family) {

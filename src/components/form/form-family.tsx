@@ -4,7 +4,7 @@ import {
   familySchema,
   IFamilyFormValues,
 } from "@/features/family/family.schema";
-import { IFamilyData } from "@/models/Family";
+import { IFamilyMember } from "@/models/Family";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
@@ -21,21 +21,43 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "../ui/input-group";
-import { FileText, Send, User, Users, XIcon } from "lucide-react";
+import {
+  ChevronLeft,
+  FileText,
+  Loader,
+  Send,
+  Trash,
+  User,
+  Users,
+  XIcon,
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
-import { useCreateFamily } from "@/features/family/family.hooks";
+import {
+  useCreateFamily,
+  useDeleteFamily,
+  useFamily,
+  useUpdateFamily,
+} from "@/features/family/family.hooks";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 type IProps = {
   mode: "CREATE" | "UPDATE";
-  initialData?: IFamilyData;
+  familyId?: string;
 };
-const FormFamily = ({ mode }: IProps) => {
-  const familyMutation = useCreateFamily();
-  const router = useRouter();
+const FormFamily = ({ mode, familyId }: IProps) => {
   const isCreate = mode === "CREATE";
+
+  const { data: familyResponse, isLoading } = useFamily(familyId || "");
+
+  const createMutation = useCreateFamily();
+  const updateMutation = useUpdateFamily();
+  const deleteMutation = useDeleteFamily();
+
+  const router = useRouter();
 
   const form = useForm<IFamilyFormValues>({
     resolver: zodResolver(familySchema),
@@ -50,14 +72,34 @@ const FormFamily = ({ mode }: IProps) => {
     },
   });
 
+  const {
+    formState: { isDirty },
+  } = form;
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const isDeleting = deleteMutation.isPending;
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "members",
   });
 
+  useEffect(() => {
+    if (!isCreate && familyResponse?.data) {
+      const { headFamily, status, members } = familyResponse.data;
+
+      form.reset({
+        headFamily,
+        status,
+        members: members.map((member: IFamilyMember) => ({
+          name: member.name,
+        })),
+      });
+    }
+  }, [familyResponse, form, isCreate]);
+
   const onSubmit = (data: IFamilyFormValues) => {
     if (isCreate) {
-      familyMutation.mutate(data, {
+      createMutation.mutate(data, {
         onSuccess: (response) => {
           toast.success(response.message);
           router.replace("/daftar-keluarga");
@@ -69,11 +111,75 @@ const FormFamily = ({ mode }: IProps) => {
       });
 
       return;
+    } else if (!isCreate && !isDirty) {
+      toast.info("Belum ada perubahan data");
+      return;
+    } else {
+      updateMutation.mutate(
+        {
+          id: familyId!,
+          payload: data,
+        },
+        {
+          onSuccess: (response) => {
+            toast.success(response.message);
+            router.replace("/daftar-keluarga");
+          },
+          onError: (error) => {
+            console.error(error);
+            toast.error(error.message || "Terjadi kesalahan");
+          },
+        }
+      );
     }
   };
 
+  const onDeleteFamily = () => {
+    deleteMutation.mutate(familyId!, {
+      onSuccess: (response) => {
+        toast.success(response.message);
+        router.replace("/daftar-keluarga");
+      },
+      onError: (error) => {
+        console.error(error);
+        toast.error(error.message || "Terjadi kesalahan");
+      },
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md h-[50vh] flex items-center justify-center">
+        <Loader className="animate-spin size-8" />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto">
+      {!isCreate && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size-="xs"
+              className="h-8 p-2 cursor-pointer"
+              onClick={() => router.back()}
+              disabled={isSubmitting || isDeleting}
+            >
+              <ChevronLeft className="size-4" />
+            </Button>
+            <span className="font-semibold">Kembali</span>
+          </div>
+          <Button
+            variant="destructive"
+            className="h-8 p-2 cursor-pointer"
+            onClick={onDeleteFamily}
+          >
+            <Trash />
+          </Button>
+        </div>
+      )}
       <h2 className="text-xl font-semibold mb-1 flex items-center justify-center gap-1">
         <FileText />
         {isCreate ? "Pendataan Keluarga Baru" : "Perbarui Data Keluarga"}
@@ -89,7 +195,12 @@ const FormFamily = ({ mode }: IProps) => {
         className="space-y-4"
         autoComplete="off"
       >
-        <div className="max-h-[50vh] overflow-y-auto pr-2 space-y-4">
+        <div
+          className={cn(
+            "overflow-y-auto pr-2 space-y-4",
+            isCreate ? "max-h-[50vh]" : "max-h-[45vh] "
+          )}
+        >
           <Controller
             name="headFamily"
             control={form.control}
@@ -126,8 +237,18 @@ const FormFamily = ({ mode }: IProps) => {
                   defaultValue="resident"
                 >
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="resident">Rumah</TabsTrigger>
-                    <TabsTrigger value="boarding">Kos</TabsTrigger>
+                    <TabsTrigger
+                      value="resident"
+                      className="data-[state=active]:bg-primary"
+                    >
+                      Rumah
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="boarding"
+                      className="data-[state=active]:bg-secondary"
+                    >
+                      Kos
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
                 {fieldState.invalid && (
@@ -198,9 +319,20 @@ const FormFamily = ({ mode }: IProps) => {
         <Button
           variant="secondary"
           type="submit"
+          disabled={(!isCreate && !isDirty) || isSubmitting || isDeleting}
           className="w-full cursor-pointer flex items-center justify-center font-semibold tracking-wide mt-2"
         >
-          {mode === "CREATE" ? "Tambahkan" : "Ubah"} Data <Send />
+          {isSubmitting ? (
+            <>
+              {isCreate ? "Menyimpan" : "Mengubah"} Data
+              <Loader className="size-4 animate-spin" />
+            </>
+          ) : (
+            <>
+              {isCreate ? "Tambahkan" : "Ubah"} Data{" "}
+              <Send className="size-4 mt-0.5" />
+            </>
+          )}
         </Button>
       </form>
     </div>

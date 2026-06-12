@@ -10,16 +10,18 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import { IFamilyData } from "@/models/Family";
-import { User, Users } from "lucide-react";
+import { Loader, User, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const ListFamily = () => {
   const router = useRouter();
   const searchValue = useFamilyStore((state) => state.searchFamily);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFamilies({
-    search: searchValue,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useFamilies({
+      search: searchValue,
+    });
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +48,14 @@ const ListFamily = () => {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  if (isLoading) {
+    return (
+      <div className="max-w-md h-[50vh] flex items-center justify-center">
+        <Loader className="animate-spin size-8" />
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -57,7 +67,14 @@ const ListFamily = () => {
             key={family._id.toString()}
             value={family._id.toString()}
           >
-            <AccordionTrigger className="hover:bg-secondary cursor-pointer px-4 text-lg flex items-start gap-2">
+            <AccordionTrigger
+              className={cn(
+                "cursor-pointer px-4 text-lg flex items-start gap-2 ",
+                family.status === "resident"
+                  ? "bg-primary hover:bg-primary/80"
+                  : "bg-secondary hover:bg-secondary/80"
+              )}
+            >
               <User className="size-6 shrink-0 mt-0.5" />
               <span className="min-w-0 break-word">{family.headFamily}</span>
             </AccordionTrigger>
@@ -66,7 +83,7 @@ const ListFamily = () => {
                 {family.members.map((member) => (
                   <li
                     key={member._id.toString()}
-                    className="hover:bg-primary cursor-pointer px-4 py-2 flex items-start gap-2 text-base"
+                    className="hover:bg-slate-100 cursor-pointer px-4 py-2 flex items-start gap-2 text-base"
                     onClick={() =>
                       router.push(`/daftar-keluarga/${family._id}`)
                     }
@@ -87,13 +104,13 @@ const ListFamily = () => {
       )}
 
       {!hasNextPage && families.length > 0 && (
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-2 text-center text-sm text-muted-foreground">
           Semua data telah dimuat
         </p>
       )}
 
       {families.length === 0 && (
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-2 text-center text-sm text-muted-foreground">
           Tidak ada data
         </p>
       )}

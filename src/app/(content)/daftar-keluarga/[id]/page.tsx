@@ -1,3 +1,5 @@
+import FormFamily from "@/components/form/form-family";
+
 type IProps = {
   params: Promise<{ id: string }>;
 };
@@ -5,7 +7,11 @@ type IProps = {
 const DetailKeluargaPage = async ({ params }: IProps) => {
   const { id } = await params;
 
-  return <div>DetailKeluargaPage {id}</div>;
+  return (
+    <div>
+      <FormFamily mode="UPDATE" familyId={id} />
+    </div>
+  );
 };
 
 export default DetailKeluargaPage;
