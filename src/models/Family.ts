@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
-export type FamilyStatus = "resident" | "boarding";
+export type IFamilyStatus = "resident" | "boarding";
 
 export interface IFamilyMember {
   _id: Types.ObjectId;
@@ -10,7 +10,7 @@ export interface IFamilyMember {
 export interface IFamilyData {
   _id: Types.ObjectId;
   headFamily: string;
-  status: FamilyStatus;
+  status: IFamilyStatus;
   members: IFamilyMember[];
 }
 

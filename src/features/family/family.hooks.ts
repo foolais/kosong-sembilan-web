@@ -9,6 +9,7 @@ import { IFamilyFormValues } from "./family.schema";
 
 type IGetFamiliesParams = {
   search?: string;
+  status?: string;
 };
 
 export function useFamilies(params?: IGetFamiliesParams) {
@@ -20,6 +21,7 @@ export function useFamilies(params?: IGetFamiliesParams) {
       const response = await api.get("/families", {
         params: {
           ...(params?.search && { cari: params.search }),
+          ...(params?.status && { status: params.status }),
           ...(pageParam > 1 && { halaman: pageParam }),
         },
       });

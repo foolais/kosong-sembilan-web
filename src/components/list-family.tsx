@@ -18,10 +18,12 @@ import HighlightText from "./highlight-text";
 const ListFamily = () => {
   const router = useRouter();
   const searchFamily = useFamilyStore((state) => state.searchFamily);
+  const statusFamily = useFamilyStore((state) => state.statusFamily);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useFamilies({
       search: searchFamily,
+      status: statusFamily,
     });
   const [manualOpenedItems, setManualOpenedItems] = useState<string[]>([]);
 
@@ -138,7 +140,7 @@ const ListFamily = () => {
 
       {families.length === 0 && (
         <p className="py-2 text-center text-sm text-muted-foreground">
-          Tidak ada data
+          Tidak ada data &quot;{searchFamily}&quot;
         </p>
       )}
     </div>

@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
-import Family from "@/models/Family";
+import Family, { IFamilyStatus } from "@/models/Family";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -8,33 +8,45 @@ export async function GET(req: NextRequest) {
 
     const search = req.nextUrl.searchParams.get("cari");
     const page = Number(req.nextUrl.searchParams.get("halaman") || 1);
-    const LIMIT = 20;
+    const status = req.nextUrl.searchParams.get("status") || "semua";
 
-    const query = search
-      ? {
-          $or: [
-            {
-              headFamily: {
-                $regex: search,
-                $options: "i",
-              },
-            },
-            {
-              "members.name": {
-                $regex: search,
-                $options: "i",
-              },
-            },
-          ],
-        }
-      : {};
+    const statusParam: "all" | IFamilyStatus =
+      status === "semua"
+        ? "all"
+        : status === "penghuni-tetap"
+        ? "resident"
+        : "boarding";
+
+    const LIMIT = 20;
+    const query: Record<string, unknown> = {};
+
+    if (search) {
+      query.$or = [
+        {
+          headFamily: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          "members.name": {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
+    }
+
+    if (statusParam !== "all") {
+      query.status = statusParam;
+    }
 
     const skip = (page - 1) * LIMIT;
     const total = await Family.countDocuments(query);
     const totalPages = Math.ceil(total / LIMIT);
 
     const families = await Family.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ headFamily: 1 })
       .skip(skip)
       .limit(LIMIT);
 

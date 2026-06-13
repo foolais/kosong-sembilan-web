@@ -28,31 +28,42 @@ const SearchInput = () => {
   }, [searchParams, setSearchFamily, searchFromUrl]);
 
   const handleSearch = () => {
-    if (inputValue.length < 3) {
-      toast.info("Pencarian nama minimal 3 huruf");
-      return;
+    try {
+      if (inputValue.length < 3) {
+        toast.info("Pencarian nama minimal 3 huruf");
+        return;
+      }
+      setSearchFamily(inputValue);
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (inputValue.trim()) {
+        params.set("cari", inputValue.toLocaleLowerCase());
+      } else {
+        params.delete("cari");
+      }
+
+      params.delete("halaman");
+
+      const query = params.toString();
+
+      router.replace(query ? `/daftar-keluarga?${query}` : "/daftar-keluarga");
+    } catch (error) {
+      console.log(error);
+      toast.error("Terjadi kesalahan pada pencarian");
     }
-    setSearchFamily(inputValue);
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (inputValue.trim()) {
-      params.set("cari", inputValue.toLocaleLowerCase());
-    } else {
-      params.delete("cari");
-    }
-
-    params.delete("halaman");
-
-    const query = params.toString();
-
-    router.replace(query ? `/daftar-keluarga?${query}` : "/daftar-keluarga");
   };
 
   const handleClear = () => {
     setInputValue("");
     clearSearchFamily();
 
-    router.replace("/daftar-keluarga");
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("halaman");
+    params.delete("cari");
+
+    const query = params.toString();
+
+    router.replace(query ? `/daftar-keluarga?${query}` : "/daftar-keluarga");
   };
 
   return (
