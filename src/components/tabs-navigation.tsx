@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 const TabsNavigation = () => {
   const pathname = usePathname();
   return (
-    <div className="absolute bottom-4 py-1.5 w-5/6 rounded-4xl max-w-sm left-1/2 -translate-x-1/2 bg-secondary shadow-2xl flex items-center justify-evenly border-2 border-foreground">
+    <div className="absolute bottom-4 py-1.5 w-5/6 rounded-4xl max-w-xs left-1/2 -translate-x-1/2 bg-secondary shadow-2xl flex items-center justify-evenly border-2 border-foreground">
       <Link
         href="/dashboard"
         className={cn(
@@ -22,7 +22,7 @@ const TabsNavigation = () => {
         <Home className="size-6" />
       </Link>
       <Link href="/tambah-keluarga">
-        <Button size="icon" className="cursor-pointer">
+        <Button size="icon" className="cursor-pointer border-2">
           <Plus className="text-foreground size-6" />
         </Button>
       </Link>

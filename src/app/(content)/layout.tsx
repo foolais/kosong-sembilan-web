@@ -4,7 +4,7 @@ import React from "react";
 
 const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-screen max-w-3xl mx-auto">
+    <div className="h-screen max-w-xl mx-auto">
       <Header />
       <main className="flex-1 h-[calc(100dvh-4rem)] overflow-y-auto p-4 bg-card rounded-t-4xl border-t-2 border-t-foreground sm:border-2 sm:border-foreground">
         {children}

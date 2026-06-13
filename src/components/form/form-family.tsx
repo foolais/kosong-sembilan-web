@@ -149,14 +149,14 @@ const FormFamily = ({ mode, familyId }: IProps) => {
 
   if (isLoading) {
     return (
-      <div className="max-w-md h-[50vh] flex items-center justify-center">
+      <div className="h-[50vh] flex items-center justify-center">
         <Loader className="animate-spin size-8" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="mx-auto">
       {!isCreate && (
         <div className="flex items-center justify-between mb-4">
           <BackButton options={{ isSubmitting, isDeleting }} />

@@ -81,15 +81,12 @@ const ListFamily = () => {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="h-[70svh] overflow-y-auto sm:w-md sm:mx-auto"
-    >
+    <div ref={containerRef} className="h-[70svh] overflow-y-auto">
       <Accordion
         type="multiple"
         value={autoOpenedItems}
         onValueChange={setManualOpenedItems}
-        className="max-w-lg space-y-4"
+        className="space-y-4"
       >
         {families.map((family: IFamilyData) => (
           <AccordionItem
