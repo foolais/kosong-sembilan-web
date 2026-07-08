@@ -28,9 +28,9 @@ const AnalyticCard = () => {
       <div className="rounded-2xl border border-foreground bg-card p-4 shadow-sm">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Home className="size-4" />
-          <span className="text-sm">Penghuni Tetap</span>
+          <span className="text-sm">Warga</span>
         </div>
-        <p className="mt-2 text-2xl font-bold text-primary">
+        <p className="mt-2 text-2xl font-bold">
           {analytic?.totalResident ?? 0}
         </p>
       </div>
@@ -40,7 +40,7 @@ const AnalyticCard = () => {
           <span className="text-sm">Kos</span>
         </div>
 
-        <p className="mt-2 text-2xl font-bold text-secondary">
+        <p className="mt-2 text-2xl font-bold">
           {analytic?.totalBoarding ?? 0}
         </p>
       </div>

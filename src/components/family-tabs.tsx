@@ -55,7 +55,7 @@ const FamilyTabs = () => {
           value="penghuni-tetap"
           className="data-[state=active]:bg-primary"
         >
-          Penghuni Tetap
+          Warga
         </TabsTrigger>
         <TabsTrigger value="kos" className="data-[state=active]:bg-secondary">
           Kos
