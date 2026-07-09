@@ -10,7 +10,7 @@ import {
   InputGroupInput,
 } from "../ui/input-group";
 import { useState } from "react";
-import { EyeIcon, EyeOffIcon, Lock, Mail, Send } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader, Lock, Mail, Send } from "lucide-react";
 import { Button } from "../ui/button";
 import { useLogin } from "@/features/auth/auth.hooks";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ import { useAuthStore } from "@/features/auth/auth.store";
 
 const FormLogin = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const loginMutattion = useLogin();
+  const loginMutation = useLogin();
   const router = useRouter();
 
   const setUser = useAuthStore((state) => state.setUser);
@@ -33,7 +33,7 @@ const FormLogin = () => {
   });
 
   const onSubmit = (data: ILoginFormValues) => {
-    loginMutattion.mutate(data, {
+    loginMutation.mutate(data, {
       onSuccess: (response) => {
         setUser(response.user);
         toast.success(response.message);
@@ -107,9 +107,16 @@ const FormLogin = () => {
         variant="secondary"
         type="submit"
         className="w-full cursor-pointer flex items-center justify-center font-semibold tracking-wide"
+        disabled={loginMutation.isPending}
       >
-        Login
-        <Send />
+        {loginMutation.isPending ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          <>
+            <span>Login</span>
+            <Send />
+          </>
+        )}
       </Button>
     </form>
   );
